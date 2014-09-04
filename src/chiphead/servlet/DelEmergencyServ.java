@@ -1,0 +1,91 @@
+package chiphead.servlet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import chiphead.config.Constants;
+import chiphead.model.AutCheck;
+import chiphead.model.Emergency;
+import chiphead.model.Person;
+
+public class DelEmergencyServ extends HttpServlet {
+
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html;charset=UTF-8");
+		response.setHeader("content-type", "text/html;charset=UTF-8");
+
+		InputStream inputStream = Resources.getResourceAsStream(Constants.MYBATISCONFIG);
+		SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder()
+				.build(inputStream);
+
+		PrintWriter out = response.getWriter();
+		SqlSession session = sqlSessionFactory.openSession();
+
+		//取出用于登录检查及修改权限检查的信息
+		String emerNoString = request.getParameter("emer_no");
+		emerNoString = emerNoString.replaceAll("\r|\n", "");
+		Integer emerNo = null;
+		if(emerNoString != null && !emerNoString.isEmpty()){
+			emerNo = Integer.parseInt(emerNoString);
+		}
+		
+		String empYstIdString = request.getParameter("emp_yst_id");
+		Integer empYstId;
+		if(empYstIdString != null && !empYstIdString.isEmpty()){
+			empYstId = Integer.parseInt(empYstIdString);
+		}
+		else{
+			empYstId = null;
+		}
+		
+		String empPwd = request.getParameter("emp_pwd");		
+
+		//根据一事通id从persons取数据
+		Person per = session.selectOne("chiphead.mapper.PersonMapper.selectPersonByEmpYstId", empYstId);
+		//根据编号在emervations中查询一条
+		Emergency em = session.selectOne("EmergencyMapper.selectEmergencyByEmerNo",emerNo);
+		//人员不存在，或记录不存在，报错返回
+		if(per == null || em == null){
+			session.close();
+			out.print(false);
+			out.flush();
+			out.close();
+			return;
+		}
+		
+		try {
+			//判断登录信息是否正确，是否有删除权限
+			if (AutCheck.YstPwdCorrect(empYstId,empPwd,session) &&
+					AutCheck.HaveDeleteEmerAut(emerNo,empYstId,session)) {
+				//删除emervations中该条目信息
+				session.delete("EmergencyMapper.deleteEmergencyByEmerNo", emerNo);
+	 			session.commit();
+				out.print(true);
+			} 
+			else{
+				out.print("noauth");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			out.print(false);
+		} finally {
+			session.close();
+		}
+		out.flush();
+		out.close();
+	}
+
+}

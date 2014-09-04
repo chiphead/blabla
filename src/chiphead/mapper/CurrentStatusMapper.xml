@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CurrentStatusMapper">
+	<resultMap type="chiphead.model.CurrentStatus" id="CurrentStatusResultMap"> 
+		<id property="stateId" column="state_id"/> 
+		<result property="stateName" column="state_name"/> 
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectCurrentStatus" parameterType="Integer" resultMap="CurrentStatusResultMap">
+    SELECT * FROM current_status WHERE state_id = #{stateId}
+  </select>
+  
+  <!-- 根据状态名查询一个 -->
+  <select id="selectCurrentStatusByStateName" parameterType="String" resultMap="CurrentStatusResultMap">
+    SELECT * FROM current_status WHERE state_name = #{stateName}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllStatus" resultMap="CurrentStatusResultMap">
+    SELECT * FROM current_status
+  </select>
+</mapper>

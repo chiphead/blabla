@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="InnovationMapper">
+	<resultMap type="chiphead.model.Innovation" id="InnovationResultMap"> 
+		<id property="innoNo" column="inno_no"/> 
+		<result property="regDate" column="reg_date"/>
+		<result property="innoType" column="inno_type"/> 
+		<result property="proposers" column="proposers"/>
+		<result property="system" column="system"/>
+		<result property="module" column="module"/>
+		<result property="suggestion" column="suggestion"/>
+		<result property="reason" column="reason"/>
+		<result property="addSuggestion" column="add_suggestion"/>
+		<result property="conclusion" column="conclusion"/>
+		<result property="executors" column="executors"/>
+		<result property="effect" column="effect"/>
+	</resultMap> 
+	
+  <!-- 根据编号查询一个 -->
+  <select id="selectInnovationByInnoNo" parameterType="Integer" resultMap="InnovationResultMap">
+    SELECT * FROM innovations WHERE inno_no = #{innoNo}
+  </select>
+  
+  <!-- 给定查询字段类型、值查询条数 -->
+  <select id="selectInnovationsNumByParms" parameterType="chiphead.model.ProjectQueryParm" resultType="Integer">
+    SELECT count(*) FROM innovations inn,inno_type t
+    <where>
+    	inn.inno_type = t.type_id
+    	<if test="queryType != null  and queryType == 'inno_type' and queryValue != ''">
+        AND t.type_name LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null  and queryType == 'proposers' and queryValue != ''">
+        AND inn.proposers LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null  and queryType == 'executors' and queryValue != ''">
+        AND inn.executors LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>   	  	
+    </where>   
+  </select>
+  
+  
+  <!-- 给定查询字段类型、值、排序字段类型、升降序、分页参数查询多条 -->
+  <select id="selectInnovationsByParms" parameterType="chiphead.model.ProjectQueryParm" resultMap="InnovationResultMap">
+    SELECT * FROM innovations inn,inno_type t
+    <where>
+    	inn.inno_type = t.type_id
+    	<if test="queryType != null  and queryType == 'inno_type' and queryValue != ''">
+        AND t.type_name LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null  and queryType == 'proposers' and queryValue != ''">
+        AND inn.proposers LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null  and queryType == 'executors' and queryValue != ''">
+        AND inn.executors LIKE CONCAT('%',#{queryValue},'%')
+        </if>   	
+    </where>
+    	<if test="orderType == null or orderMethod == null">
+         order by inn.reg_date ASC
+        </if>   
+    	<if test="orderType != null and orderMethod != null">
+         order by inn.${orderType} ${orderMethod}
+        </if> 
+    	 limit #{startIndex},#{fetchNum}	 
+  </select>
+  
+  <!--查询所有记录，按提出日期升序排列 -->
+  <select id="selectAllInnovationsOrderByRegDateASC" resultMap="InnovationResultMap">
+    SELECT * FROM innovations
+         ORDER BY reg_date ASC	 
+  </select>
+  
+  
+  <!-- 增加一条记录 -->
+  <insert id="insertInnovation" parameterType="Innovation" 
+  		flushCache="true" statementType="PREPARED">
+    INSERT INTO innovations (inno_no,reg_date,inno_type,proposers,system,module,suggestion,reason,
+    						add_suggestion,conclusion,executors,effect)
+    			VALUES (#{innoNo},#{regDate},#{innoType},#{proposers},#{system},#{module},
+    					#{suggestion},#{reason},#{addSuggestion},#{conclusion},#{executors},
+    					#{effect})
+  </insert>
+  
+  <!-- 根据编号更新 -->
+  <update id="updateInnovationByInnoNo" parameterType="Innovation">
+    UPDATE innovations SET inno_no=#{innoNo},reg_date=#{regDate},inno_type=#{innoType},
+    					proposers=#{proposers},system=#{system},
+    					module=#{module},suggestion=#{suggestion},
+    					reason=#{reason},add_suggestion=#{addSuggestion},
+    					conclusion=#{conclusion},executors=#{executors},
+    					effect=#{effect}
+     				WHERE inno_no=#{innoNo}
+  </update>
+  
+  
+  <!-- 根据编号更新结论 -->
+  <update id="updateConclusionByInnoNo" parameterType="Innovation">
+    UPDATE innovations SET conclusion=#{conclusion}
+     				WHERE inno_no=#{innoNo}
+  </update>
+  
+  <!-- 删除 -->
+  <delete id="deleteInnovationByInnoNo" parameterType="Integer">
+    DELETE FROM innovations WHERE inno_no=#{innoNo}
+  </delete>
+  
+</mapper>

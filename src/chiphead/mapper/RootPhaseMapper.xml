@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RootPhaseMapper">
+	<resultMap type="chiphead.model.RootPhase" id="RootPhaseResultMap"> 
+		<id property="rootPhaseId" column="root_phase_id"/> 
+		<result property="rootPhaseName" column="root_phase_name"/> 
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectRootPhase" parameterType="Integer" resultMap="RootPhaseResultMap">
+    SELECT * FROM root_phase WHERE root_phase_id = #{rootPhaseId}
+  </select>
+  
+  <!-- 根据阶段名查询一个 -->
+  <select id="selectRootPhaseByRootPhaseName" parameterType="String" resultMap="RootPhaseResultMap">
+    SELECT * FROM root_phase WHERE root_phase_name = #{rootPhaseName}
+  </select>
+  
+  <!-- 根据阶段id查询阶段名 -->
+  <select id="selectRootPhaseNameByRootPhaseId" parameterType="Integer" resultType="String">
+    SELECT root_phase_name FROM root_phase WHERE root_phase_id = #{rootPhaseId}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllRootPhases" resultMap="RootPhaseResultMap">
+    SELECT * FROM root_phase
+  </select>
+</mapper>

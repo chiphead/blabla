@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WeekNumSetMapper">
+	<resultMap type="chiphead.model.WeekNumSet" id="WeekNumSetResultMap"> 
+		<id property="id" column="id"/> 
+		<result property="year" column="year"/> 
+		<result property="month" column="month"/> 
+		<result property="weekNum" column="week_num"/> 
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectWeekNum" parameterType="BigInteger" resultMap="WeekNumSetResultMap">
+    SELECT * FROM week_num_set WHERE id = #{id}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllWeekNums" resultMap="WeekNumSetResultMap">
+    SELECT * FROM week_num_set
+  </select>
+  
+  
+  <!-- 根据年份月份查询一个 -->
+  <select id="selectWeekNumByYearMonth" parameterType="WeekNumSet" resultMap="WeekNumSetResultMap" resultType="Integer">
+    SELECT * FROM week_num_set 
+    		WHERE 	year = #{year} and 
+    				month = #{month}
+  </select>
+</mapper>

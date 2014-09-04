@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HistoryPersonProjectMapper">
+	<resultMap type="chiphead.model.PersonProject" id="HistoryPersonProjectResultMap"> 
+		<id property="empProjId" column="emp_proj_id"/> 
+		<result property="empYstId" column="emp_yst_id"/> 
+		<result property="projNo" column="proj_no"/> 
+		<result property="roleId" column="role_id"/> 
+	</resultMap> 
+  <!-- 查询一个 -->
+  <select id="selectPersonProject" parameterType="BigInteger" 
+  	resultMap="HistoryPersonProjectResultMap">
+    SELECT * FROM history_person_project WHERE emp_proj_id = #{empProjId}
+  </select>
+  
+  <!-- 根据项目编号查询 -->
+  <select id="selectPersonProjectByProjNo" parameterType="String" 
+  	resultMap="HistoryPersonProjectResultMap">
+    SELECT * FROM history_person_project WHERE proj_no = #{projNo}
+  </select>
+  
+  <!-- 根据项目编号和角色查询 -->
+  <select id="selectPersonByProjNoRoleId" parameterType="PersonProject" 
+  	resultType="Person">
+    SELECT  p.emp_yst_id,p.emp_name,p.emp_aut
+    		FROM history_person_project pp,persons p
+    		WHERE pp.emp_yst_id = p.emp_yst_id AND
+    				proj_no = #{projNo} AND 
+    			    role_id = #{roleId}
+  </select>
+  
+  <!-- 查询不同的一事通id，项目编号个数，即员工排期表记录条数,根据参数-->
+  <select id="selectDistinctPersonProjectNumByParms" parameterType="chiphead.model.ProjectQueryParm" resultType="Integer">
+    SELECT COUNT(DISTINCT pp.emp_yst_id,pp.proj_no) 
+    		FROM history_person_project pp,persons per,projects p,team t	
+  	<where>
+  		pp.emp_yst_id = per.emp_yst_id AND pp.proj_no = p.proj_no AND per.team_id = t.team_id
+  		<if test="queryType != null and queryType == 'self' and queryValue != ''">
+        AND pp.emp_yst_id = CAST(#{queryValue} AS SIGNED INTEGER) 
+    	</if>
+    	<if test="queryType != null and queryType == 'emp_name' and queryValue != ''">
+        AND per.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null and queryType == 'proj_name' and queryValue != ''">
+        AND p.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>  
+    	<if test="queryType != null and queryType == 'proj_no' and queryValue != ''">
+        AND pp.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null and queryType == 'team_name' and queryValue != ''">
+        AND t.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<!-- 显示本组，先把teamName从一事通id转成team_id再传入 -->
+    	<if test="teamName != null and teamName != 'all'">
+        AND t.team_id = CAST(#{teamName} AS SIGNED INTEGER) 
+    	</if>	
+    </where>  
+  </select>
+  
+  <!-- 查询不同的一事通id，项目编号,根据参数-->
+  <select id="selectDistinctPersonProjectByParms" parameterType="chiphead.model.ProjectQueryParm" resultMap="HistoryPersonProjectResultMap">
+    SELECT  pp.emp_proj_id,pp.emp_yst_id,pp.proj_no
+    		FROM history_person_project	pp,persons per,projects p,team t
+  	<where>
+  		pp.emp_yst_id = per.emp_yst_id AND pp.proj_no = p.proj_no AND per.team_id = t.team_id
+  		<if test="queryType != null and queryType == 'self' and queryValue != ''">
+        AND pp.emp_yst_id = CAST(#{queryValue} AS SIGNED INTEGER) 
+    	</if>
+    	<if test="queryType != null and queryType == 'emp_name' and queryValue != ''">
+        AND per.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null and queryType == 'proj_name'and queryValue != ''">
+        AND p.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null and queryType == 'proj_no' and queryValue != ''">
+        AND pp.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null and queryType == 'team_name' and queryValue != ''">
+        AND t.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>	
+    	<!-- 显示本组，先把teamName从一事通id转成team_id再传入 -->
+    	<if test="teamName != null and teamName != 'all'">
+        AND t.team_id = CAST(#{teamName} AS SIGNED INTEGER) 
+    	</if>
+    </where>  
+    	GROUP BY pp.emp_yst_id,pp.proj_no
+    	<if test="orderType != null and orderType == 'emp_name' and orderMethod != null">
+         order by per.${orderType} ${orderMethod}
+        </if> 
+        <if test="orderType != null and orderType == 'proj_name'and orderMethod != null">
+         order by p.${orderType} ${orderMethod}
+        </if> 
+        <if test="orderType != null and orderType == 'proj_no'and orderMethod != null">
+         order by pp.${orderType} ${orderMethod}
+        </if> 
+    	limit #{startIndex},#{fetchNum}	
+  </select>
+  
+  <!-- 根据项目编号和角色查询姓名 -->
+  <select id="selectEmpNameByProjNoRoleId" parameterType="PersonProject" 
+  	resultType="String">
+    SELECT  p.emp_name 
+    		FROM history_person_project pp,persons p
+    		WHERE pp.emp_yst_id = p.emp_yst_id AND
+    				proj_no = #{projNo} AND 
+    			    role_id = #{roleId}
+  </select>
+  
+  <!-- 根据一事通ID和项目编号查询一个 -->
+  <select id="selectPersonProjectByEmpYstIdProjNo" parameterType="PersonProject" 
+  	resultMap="HistoryPersonProjectResultMap">
+    SELECT * FROM history_person_project 
+    		WHERE emp_yst_id = #{empYstId} AND
+    			  proj_no = #{projNo}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllPersonProjects" resultMap="HistoryPersonProjectResultMap">
+    SELECT * FROM history_person_project
+  </select>
+  
+  <!-- 增加一条记录 -->
+  <insert id="insertPersonProject" parameterType="PersonProject" 
+  		flushCache="true" statementType="PREPARED">
+    INSERT INTO history_person_project (emp_proj_id, emp_yst_id,proj_no,role_id)
+    					VALUES (#{empProjId},#{empYstId},#{projNo},#{roleId})
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="updatePersonProject" parameterType="PersonProject">
+    UPDATE history_person_project SET emp_yst_id=#{empYstId},proj_no=#{projNo},role_id=#{roleId}
+     						WHERE emp_proj_id=#{empProjId}
+  </update>
+  
+  <!-- 删除 -->
+  <delete id="deletePersonProject" parameterType="BigInteger">
+    DELETE FROM history_person_project WHERE emp_proj_id=#{empProjId}
+  </delete>
+  <!-- 根据项目编号删除 -->
+  <delete id="deletePersonProjectByProjNo" parameterType="String">
+    DELETE FROM history_person_project WHERE proj_no=#{projNo}
+  </delete>
+</mapper>

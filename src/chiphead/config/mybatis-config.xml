@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 别名 --> 
+	<typeAliases> 
+		<typeAlias type="chiphead.model.PersonProject" alias="PersonProject"/>  
+		<typeAlias type="chiphead.model.Project" alias="Project"/>
+		<typeAlias type="chiphead.model.Person" alias="Person"/> 
+		<typeAlias type="chiphead.model.ProjectPhase" alias="ProjectPhase"/> 
+		<typeAlias type="chiphead.model.RootProjectPhase" alias="RootProjectPhase"/>
+		<typeAlias type="chiphead.model.WeekNumSet" alias="WeekNumSet"/>  
+		<typeAlias type="chiphead.model.Operation" alias="Operation"/>  
+		<typeAlias type="chiphead.model.Innovation" alias="Innovation"/>  
+	</typeAliases> 
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost/project_information"/>
+        <property name="username" value="root"/>
+        <property name="password" value="toor"/>
+      </dataSource>
+    </environment>
+  </environments>
+  <mappers>
+    <mapper resource="chiphead/mapper/CurrentStatusMapper.xml"/>
+    <mapper resource="chiphead/mapper/EvaluateStateMapper.xml"/>
+    <mapper resource="chiphead/mapper/PersonProjectMapper.xml"/>
+    <mapper resource="chiphead/mapper/HistoryPersonProjectMapper.xml"/>
+    <mapper resource="chiphead/mapper/ProjectMapper.xml"/>
+    <mapper resource="chiphead/mapper/HistoryProjectMapper.xml"/>
+    <mapper resource="chiphead/mapper/PersonMapper.xml"/>
+    <mapper resource="chiphead/mapper/ProjectPhaseMapper.xml"/>
+    <mapper resource="chiphead/mapper/HistoryProjectPhaseMapper.xml"/>
+    <mapper resource="chiphead/mapper/RootProjectPhaseMapper.xml"/>
+    <mapper resource="chiphead/mapper/HistoryRootProjectPhaseMapper.xml"/>
+    <mapper resource="chiphead/mapper/PhaseMapper.xml"/>
+    <mapper resource="chiphead/mapper/TeamMapper.xml"/>
+    <mapper resource="chiphead/mapper/RootPhaseMapper.xml"/>
+    <mapper resource="chiphead/mapper/ProjectRoleMapper.xml"/>
+    <mapper resource="chiphead/mapper/ProjectTypeMapper.xml"/>
+    <mapper resource="chiphead/mapper/MasterSlaveMapper.xml"/>
+    <mapper resource="chiphead/mapper/OperationMapper.xml"/>
+    <mapper resource="chiphead/mapper/OperationTypeMapper.xml"/>
+    <mapper resource="chiphead/mapper/InnovationMapper.xml"/>
+    <mapper resource="chiphead/mapper/InnovationTypeMapper.xml"/>
+    <mapper resource="chiphead/mapper/SystemTypeMapper.xml"/>
+    <mapper resource="chiphead/mapper/ModuleTypeMapper.xml"/>
+    <mapper resource="chiphead/mapper/StTypeMapper.xml"/>
+    <mapper resource="chiphead/mapper/LevelMapper.xml"/>
+    <mapper resource="chiphead/mapper/WeekNumSetMapper.xml"/>
+    <mapper resource="chiphead/mapper/EmergencyMapper.xml"/>
+  </mappers>
+</configuration>

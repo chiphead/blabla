@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProjectTypeMapper">
+	<resultMap type="chiphead.model.ProjectType" id="ProjectTypeResultMap"> 
+		<id property="typeId" column="type_id"/> 
+		<result property="typeName" column="type_name"/> 
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectProjectType" parameterType="Integer" resultMap="ProjectTypeResultMap">
+    SELECT * FROM project_type WHERE type_id = #{typeId}
+  </select>
+  
+  <!-- 根据类型名查询一个 -->
+  <select id="selectProjectTypeByTypeName" parameterType="String" resultMap="ProjectTypeResultMap">
+    SELECT * FROM project_type WHERE type_name = #{typeName}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllProjectTypes" resultMap="ProjectTypeResultMap">
+    SELECT * FROM project_type
+  </select>
+</mapper>

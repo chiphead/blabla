@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="InnovationTypeMapper">
+	<resultMap type="chiphead.model.InnovationType" id="InnovationTypeResultMap"> 
+		<id property="typeId" column="type_id"/> 
+		<result property="typeName" column="type_name"/> 
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectInnovationType" parameterType="Integer" resultMap="InnovationTypeResultMap">
+    SELECT * FROM inno_type WHERE type_id = #{typeId}
+  </select>
+  
+  <!-- 根据类型名查询一个 -->
+  <select id="selectInnovationTypeByTypeName" parameterType="String" resultMap="InnovationTypeResultMap">
+    SELECT * FROM inno_type WHERE type_name = #{typeName}
+  </select>
+  
+  <!-- 根据类型id查询一个 -->
+  <select id="selectInnovationTypeByTypeId" parameterType="Integer" resultMap="InnovationTypeResultMap">
+    SELECT * FROM inno_type WHERE type_id = #{typeId}
+  </select>
+  
+  <!-- 根据类型id查询类型名 -->
+  <select id="selectTypeNameByTypeId" parameterType="Integer" resultType="String">
+    SELECT type_name FROM inno_type WHERE type_id = #{typeId}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllInnovationTypes" resultMap="InnovationTypeResultMap">
+    SELECT * FROM inno_type
+  </select>
+</mapper>

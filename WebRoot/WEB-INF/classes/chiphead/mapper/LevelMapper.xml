@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LevelMapper">
+	<resultMap type="chiphead.model.Level" id="LevelResultMap"> 
+		<id property="levelId" column="level_id"/> 
+		<result property="levelName" column="level_name"/> 
+	</resultMap> 
+	
+  <!-- 根据level id查询一个 -->
+  <select id="selectLevel" parameterType="Integer" resultMap="LevelResultMap">
+    SELECT * FROM level WHERE level_id = #{levelId}
+  </select>
+  
+  <!-- 根据level名查询一个 -->
+  <select id="selectLevelByLevelName" parameterType="String" resultMap="LevelResultMap">
+    SELECT * FROM level WHERE level_name = #{levelName}
+  </select>
+  
+  <!-- 根据level ID查询level名 -->
+  <select id="selectLevelNameByLevelId" parameterType="Integer" resultType="String">
+    SELECT level_name FROM level WHERE level_id = #{levelId}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllLevels" resultMap="LevelResultMap">
+    SELECT * FROM level
+  </select>
+</mapper>

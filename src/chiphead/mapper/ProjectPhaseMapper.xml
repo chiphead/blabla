@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProjectPhaseMapper">
+	<resultMap type="chiphead.model.ProjectPhase" id="ProjectPhaseResultMap"> 
+		<id property="projPhaseId" column="proj_phase_id"/> 
+		<result property="empYstId" column="emp_yst_id"/> 
+		<result property="projNo" column="proj_no"/>
+		<result property="phaseId" column="phase_id"/>
+		<result property="year" column="year"/>
+		<result property="month" column="month"/>
+		<result property="weekNo" column="week_no"/>
+		<result property="devoteHours" column="devote_hours"/>
+		<result property="checkState" column="check_state"/>
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectProjectPhase" parameterType="BigInteger" resultMap="ProjectPhaseResultMap">
+    SELECT * FROM project_phase WHERE proj_phase_id = #{projPhaseId}
+  </select>
+  
+  <!-- 根据项目编号查询 -->
+  <select id="selectProjectPhaseByProjNo" parameterType="String" resultMap="ProjectPhaseResultMap">
+    SELECT * FROM project_phase WHERE proj_no = #{projNo}
+  </select>
+  
+  <!-- 根据一事通ID、项目编号、阶段、年份、月份、周序号查询一条 -->
+  <select id="selectProjectPhaseByYPYMWP" parameterType="ProjectPhase" resultMap="ProjectPhaseResultMap">
+    SELECT * FROM project_phase 
+    		  WHERE emp_yst_id = #{empYstId} AND
+    				proj_no = #{projNo} AND
+    				phase_id = #{phaseId} AND
+    				year = #{year} AND
+    				month = #{month} AND
+    				week_no = #{weekNo}
+  </select>
+  
+  <!-- 根据一事通ID、项目编号、年份、月份、周序号查询记录 -->
+  <select id="selectProjectPhaseByYPYMW" parameterType="ProjectPhase" resultMap="ProjectPhaseResultMap">
+    SELECT * FROM project_phase 
+    		 WHERE  emp_yst_id = #{empYstId} AND
+    				proj_no = #{projNo} AND
+    				year = #{year} AND
+    				month = #{month} AND
+    				week_no = #{weekNo}
+    		 ORDER BY phase_id ASC
+  </select>
+  
+  <!-- 根据一事通ID、项目编号、年份查询记录 -->
+  <select id="selectProjectPhaseByYPY" parameterType="ProjectPhase" resultMap="ProjectPhaseResultMap">
+    SELECT * FROM project_phase 
+    		 WHERE emp_yst_id = #{empYstId} AND
+    				proj_no = #{projNo} AND
+    				year = #{year}
+    		 ORDER BY month,week_no,phase_id ASC
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllProjectPhases" resultMap="ProjectPhaseResultMap">
+    SELECT * FROM project_phase
+  </select>
+  
+  
+  <!-- 查询不同的一事通id，项目编号,指定一事通id-->
+  <select id="selectDistinctProjectPhasesByEmpYstId" parameterType="Integer" resultMap="ProjectPhaseResultMap">
+    SELECT  proj_phase_id,emp_yst_id,proj_no
+    		FROM project_phase
+    		WHERE emp_yst_id = #{empYstId}
+    		GROUP BY emp_yst_id,proj_no
+  </select>
+  
+  
+  <!-- 查询不同的一事通id，项目编号-->
+  <select id="selectDistinctProjectPhases" resultMap="ProjectPhaseResultMap">
+    SELECT  proj_phase_id,emp_yst_id,proj_no
+    		FROM project_phase
+    		GROUP BY emp_yst_id,proj_no
+  </select>
+  
+  <!-- 查询不同的一事通id，项目编号,根据参数-->
+  <select id="selectDistinctProjectPhasesByParms" parameterType="chiphead.model.ProjectQueryParm" resultMap="ProjectPhaseResultMap">
+    SELECT  pp.proj_phase_id,pp.emp_yst_id,pp.proj_no
+    		FROM project_phase pp,persons per,projects p	
+  	<where>
+  		pp.emp_yst_id = per.emp_yst_id AND pp.proj_no = p.proj_no
+  		<if test="queryType != null and queryType == 'self' and queryValue != ''">
+        AND per.emp_yst_id = CAST(#{queryValue} AS SIGNED INTEGER) 
+    	</if>
+    	<if test="queryType != null and queryType == 'emp_name' and queryValue != ''">
+        AND per.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null and queryType == 'proj_name'and queryValue != ''">
+        AND p.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>
+    	<if test="queryType != null and queryType == 'proj_no' and queryValue != ''">
+        AND pp.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>  	
+    </where>  
+    	GROUP BY pp.emp_yst_id,pp.proj_no
+    	<if test="orderType != null and orderType == 'emp_name' and orderMethod != null">
+         order by per.${orderType} ${orderMethod}
+        </if> 
+        <if test="orderType != null and orderType == 'proj_name'and orderMethod != null">
+         order by p.${orderType} ${orderMethod}
+        </if> 
+        <if test="orderType != null and orderType == 'proj_no'and orderMethod != null">
+         order by pp.${orderType} ${orderMethod}
+        </if> 
+    	limit #{startIndex},#{fetchNum}	
+  </select>
+  
+  <!-- 查询不同的一事通id，项目编号个数，即员工排期表记录条数-->
+  <select id="selectDistinctProjectPhaseNum" resultType="Integer">
+    SELECT COUNT(DISTINCT emp_yst_id,proj_no) 
+    		FROM project_phase
+  </select>
+  
+  <!-- 查询不同的一事通id，项目编号个数，即员工排期表记录条数，指定一事通id-->
+  <select id="selectDistinctProjectPhaseNumByEmpYstId" parameterType="Integer" resultType="Integer">
+    SELECT COUNT(DISTINCT emp_yst_id,proj_no) 
+    		FROM project_phase
+    		WHERE emp_yst_id = #{empYstId}
+  </select>
+  
+  <!-- 查询不同的一事通id，项目编号个数，即员工排期表记录条数,根据参数-->
+  <select id="selectDistinctProjectPhaseNumByParms" parameterType="chiphead.model.ProjectQueryParm" resultType="Integer">
+    SELECT COUNT(DISTINCT pp.emp_yst_id,p.proj_no) 
+    		FROM project_phase pp,persons per,projects p	
+  	<where>
+  		pp.emp_yst_id = per.emp_yst_id AND pp.proj_no = p.proj_no
+  		<if test="queryType != null and queryType == 'self' and queryValue != ''">
+        AND per.emp_yst_id = CAST(#{queryValue} AS SIGNED INTEGER) 
+    	</if>
+    	<if test="queryType != null and queryType == 'emp_name' and queryValue != ''">
+        AND per.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null and queryType == 'proj_name' and queryValue != ''">
+        AND p.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>  
+    	<if test="queryType != null and queryType == 'proj_no' and queryValue != ''">
+        AND pp.${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 	
+    </where>  
+  </select>
+  
+  <!-- 增加一条记录 -->
+  <insert id="insertProjectPhase" parameterType="ProjectPhase" 
+  		flushCache="true" statementType="PREPARED">
+    INSERT INTO project_phase (proj_phase_id,emp_yst_id,proj_no,phase_id,
+    							year,month,week_no,devote_hours,
+    							check_state)
+    			VALUES (#{projPhaseId},#{empYstId},#{projNo},#{phaseId},
+    							#{year},#{month},#{weekNo},#{devoteHours},
+    							#{checkState})
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="updateProjectPhase" parameterType="ProjectPhase">
+    UPDATE project_phase SET emp_yst_id=#{empYstId},proj_no=#{projNo},
+    					phase_id=#{phaseId},year=#{year},month=#{month},
+    					week_no=#{weekNo},devote_hours=#{devoteHours},
+    					check_state=#{checkState}
+     				WHERE proj_phase_id=#{projPhaseId}
+  </update>
+  
+  <!-- 根据一事通id、项目编号、年份、月份、周序号更新审核状态 -->
+  <update id="updateProjectPhaseCheckStateByEPYMW" parameterType="ProjectPhase">
+    UPDATE project_phase SET check_state=#{checkState}
+     				WHERE emp_yst_id=#{empYstId} AND
+     						proj_no=#{projNo} AND
+    						year=#{year} AND
+    						month=#{month} AND
+    						week_no=#{weekNo}
+  </update>
+  
+  <!-- 删除 -->
+  <delete id="deleteProjectPhase" parameterType="BigInteger">
+    DELETE FROM project_phase WHERE proj_phase_id=#{projPhaseId}
+  </delete>
+  
+  <!-- 根据项目编号删除 -->
+  <delete id="deleteProjectPhaseByProjNo" parameterType="String">
+    DELETE FROM project_phase WHERE proj_no=#{projNo}
+  </delete>
+  
+  <!-- 根据一事通id、项目编号、年份、月份、周序号删除 -->
+  <delete id="deleteProjectPhaseByEPYMW" parameterType="ProjectPhase">
+    DELETE FROM project_phase WHERE emp_yst_id = #{empYstId} AND
+    								proj_no=#{projNo} AND
+    								year = #{year} AND
+    								month = #{month} AND
+    								week_no = #{weekNo}							
+  </delete>
+</mapper>

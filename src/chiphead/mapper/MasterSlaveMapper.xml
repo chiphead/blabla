@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MasterSlaveMapper">
+	<resultMap type="chiphead.model.MasterSlave" id="MasterSlaveResultMap"> 
+		<id property="typeId" column="type_id"/> 
+		<result property="typeName" column="type_name"/> 
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectMasterSlave" parameterType="Integer" resultMap="MasterSlaveResultMap">
+    SELECT * FROM master_slave WHERE type_id = #{typeId}
+  </select>
+  
+  <!-- 根据类型名查询一个 -->
+  <select id="selectMasterSlaveByTypeName" parameterType="String" resultMap="MasterSlaveResultMap">
+    SELECT * FROM master_slave WHERE type_name = #{typeName}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllMasterSlaves" resultMap="MasterSlaveResultMap">
+    SELECT * FROM master_slave
+  </select>
+</mapper>

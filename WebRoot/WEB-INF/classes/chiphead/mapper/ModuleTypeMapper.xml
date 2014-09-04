@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ModuleTypeMapper">
+	<resultMap type="chiphead.model.ModuleType" id="ModuleTypeResultMap"> 
+		<id property="typeId" column="type_id"/> 
+		<result property="typeName" column="type_name"/> 
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectModuleType" parameterType="Integer" resultMap="ModuleTypeResultMap">
+    SELECT * FROM module_type WHERE type_id = #{typeId}
+  </select>
+  
+  <!-- 根据类型名查询一个 -->
+  <select id="selectModuleTypeByTypeName" parameterType="String" resultMap="ModuleTypeResultMap">
+    SELECT * FROM module_type WHERE type_name = #{typeName}
+  </select>
+  
+  <!-- 根据类型id查询一个 -->
+  <select id="selectModuleTypeByTypeId" parameterType="Integer" resultMap="ModuleTypeResultMap">
+    SELECT * FROM module_type WHERE type_id = #{typeId}
+  </select>
+  
+  <!-- 根据类型id查询类型名 -->
+  <select id="selectTypeNameByTypeId" parameterType="Integer" resultType="String">
+    SELECT type_name FROM module_type WHERE type_id = #{typeId}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllModuleTypes" resultMap="ModuleTypeResultMap">
+    SELECT * FROM module_type
+  </select>
+</mapper>

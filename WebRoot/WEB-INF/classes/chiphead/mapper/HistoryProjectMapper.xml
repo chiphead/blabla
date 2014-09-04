@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HistoryProjectMapper">
+	<resultMap type="chiphead.model.Project" id="HistoryProjectResultMap"> 
+		<id property="projId" column="proj_id"/> 
+		<result property="updateTime" column="update_time"/> 
+		<result property="reqNo" column="req_no"/> 
+		<result property="projNo" column="proj_no"/> 
+		<result property="projName" column="proj_name"/> 
+		<result property="projType" column="proj_type"/>
+		<result property="masterSlave" column="master_slave"/>
+		<result property="projCharge" column="proj_charge"/>
+		<result property="projManager" column="proj_manager"/>
+		<result property="curState" column="cur_state"/>
+		<result property="riskQuestion" column="risk_question"/>
+		<result property="startDate" column="start_date"/>
+		<result property="actualInstallDate" column="actual_install_date"/>
+		<result property="planEndDate" column="plan_end_date"/>
+		<result property="actualEndDate" column="actual_end_date"/>
+		<result property="actualDays" column="actual_days"/>
+		<result property="overdueReason" column="overdue_reason"/>
+		<result property="planWorkAmount" column="plan_work_amount"/>
+		<result property="actualWorkAmount" column="actual_work_amount"/>
+		<result property="functionAmount" column="function_amount"/>
+		<result property="productivity" column="productivity"/>
+		<result property="smokeNum" column="smoke_num"/>
+		<result property="stType" column="st_type"/>
+		<result property="stBugDensity" column="st_bug_density"/>
+		<result property="nc" column="nc"/>
+		<result property="designAudit" column="design_audit"/>
+		<result property="codeAudit" column="code_audit"/>
+		<result property="installAudit" column="install_audit"/>
+		<result property="experience" column="experience"/>
+		<result property="problemAnalysis" column="problem_analysis"/>
+		<result property="remark" column="remark"/>	
+		<result property="evaluateState" column="evaluate_state"/> 
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectProject" parameterType="BigInteger" resultMap="HistoryProjectResultMap">
+    SELECT * FROM history_projects WHERE proj_id = #{projId}
+  </select>
+  
+  <!-- 根据项目编号查询一个 -->
+  <select id="selectProjectByProjNo" parameterType="String" resultMap="HistoryProjectResultMap">
+    SELECT * FROM history_projects WHERE proj_no = #{projNo}
+  </select>
+  
+  <!-- 根据项目编号,连接proj_type表,查询项目类型名 -->
+  <select id="getProjectTypeNameByProjNo" parameterType="String" resultType="String">
+    SELECT t.type_name
+    	FROM history_projects p, project_type t
+    	WHERE p.proj_type = t.type_id
+    	AND	p.proj_no = #{projNo}
+  </select>
+  
+  <!-- 根据项目编号,连接current_status表,查询当前状态名 -->
+  <select id="getProjectCurStateNameByProjNo" parameterType="String" resultType="String">
+    SELECT c.state_name
+    	FROM history_projects p, current_status c
+    	WHERE p.cur_state = c.state_id
+    	AND	p.proj_no = #{projNo}
+  </select>
+  
+  <!-- 根据项目编号,连接st_type表,查询ST测试类型名 -->
+  <select id="getProjectStTypeNameByProjNo" parameterType="String" resultType="String">
+    SELECT s.st_name
+    	FROM history_projects p, st_type s
+    	WHERE p.st_type = s.st_id
+    	AND	p.proj_no = #{projNo}
+  </select>
+  
+  <!-- 根据项目编号,连接evaluate_state表,查询评估状态 -->
+  <select id="getProjectEvaluateStateNameByProjNo" parameterType="String" resultType="String">
+    SELECT e.state_name
+    	FROM history_projects p, evaluate_state e
+    	WHERE p.evaluate_state = e.state_id
+    	AND	p.proj_no = #{projNo}
+  </select>
+  
+  <!-- 根据项目编号模糊查询 -->
+  <select id="selectProjectByProjNoPart" parameterType="String" resultMap="HistoryProjectResultMap">
+    SELECT * FROM history_projects WHERE proj_no LIKE CONCAT('%',#{projNo},'%')
+  </select>
+  
+  <!-- 根据项目名称查询 -->
+  <select id="selectProjectByProjName" parameterType="String" resultMap="HistoryProjectResultMap">
+    SELECT * FROM history_projects WHERE proj_name = #{projName}
+  </select>
+  
+  <!-- 根据项目名称模糊查询 -->
+  <select id="selectProjectByProjNamePart" parameterType="String" resultMap="HistoryProjectResultMap">
+    SELECT * FROM history_projects WHERE proj_name LIKE CONCAT('%',#{projName},'%')
+  </select>
+  
+  
+  <!-- 查询条数 -->
+  <select id="selectProjectsNum" resultType="Integer">
+    SELECT COUNT(*) FROM history_projects
+  </select>
+  
+  
+  <!-- 查询多个 -->
+  <select id="selectAllProjects" resultMap="HistoryProjectResultMap">
+    SELECT * FROM history_projects
+  </select>
+  
+  
+  <!-- 给定查询字段类型、值查询条数 -->
+  <select id="selectProjectsNumByParms" parameterType="chiphead.model.ProjectQueryParm" resultType="Integer">
+    SELECT count(*) FROM history_projects
+    <where>
+    	<if test="queryType != null and queryValue != ''">
+         ${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>   	
+    </where>   
+  </select>
+  
+  
+  <!-- 给定查询字段类型、值、排序字段类型、升降序、分页参数查询多条 -->
+  <select id="selectProjectsByParms" parameterType="chiphead.model.ProjectQueryParm" resultMap="HistoryProjectResultMap">
+    SELECT * FROM history_projects
+    <where>
+    	<if test="queryType != null and queryValue != ''">
+         ${queryType} LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>   	
+    </where>  
+    	<if test="orderType != null and orderMethod != null">
+         order by ${orderType} ${orderMethod}
+        </if> 
+    	 limit #{startIndex},#{fetchNum}	 
+  </select>
+  
+  
+  <!-- 增加一条记录 -->
+  <insert id="insertProject" parameterType="Project" 
+  		flushCache="true" statementType="PREPARED">
+    INSERT INTO history_projects (proj_id,update_time,req_no,proj_no,proj_name,proj_type,master_slave,proj_charge,proj_manager,
+    					cur_state,risk_question,start_date,actual_install_date,plan_end_date,
+    					actual_end_date,actual_days,overdue_reason,plan_work_amount,actual_work_amount,
+    					function_amount,productivity,smoke_num,st_type,st_bug_density,
+    					nc,design_audit,code_audit,install_audit,experience,
+    					problem_analysis,remark,evaluate_state)
+    			VALUES (#{projId},#{updateTime},#{reqNo},#{projNo},#{projName},#{projType},#{masterSlave},#{projCharge},#{projManager},
+    					#{curState},#{riskQuestion},#{startDate},#{actualInstallDate},#{planEndDate},
+    					#{actualEndDate},#{actualDays},#{overdueReason},#{planWorkAmount},#{actualWorkAmount},
+    					#{functionAmount},#{productivity},#{smokeNum},#{stType},#{stBugDensity},
+    					#{nc},#{designAudit},#{codeAudit},#{installAudit},#{experience},
+    					#{problemAnalysis},#{remark},#{evaluateState})
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="updateProject" parameterType="Project">
+    UPDATE history_projects SET update_time=#{updateTime},req_no=#{reqNo},proj_no=#{projNo},
+    					proj_name=#{projName},proj_type=#{projType},master_slave=#{masterSlave},
+    					proj_charge=#{projCharge},proj_manager=#{projManager},
+    					cur_state=#{curState},
+    					risk_question=#{riskQuestion},start_date=#{startDate},
+    					actual_install_date=#{actualInstallDate},
+    					plan_end_date=#{planEndDate},actual_end_date=#{actualEndDate},
+    					actual_days=#{actualDays},
+    					overdue_reason=#{overdueReason},plan_work_amount=#{planWorkAmount},
+    					actual_work_amount=#{actualWorkAmount},function_amount=#{functionAmount},
+    					productivity=#{productivity},smoke_num=#{smokeNum},st_type=#{stType},
+    					st_bug_density=#{stBugDensity},nc=#{nc},design_audit=#{designAudit},
+    					code_audit=#{codeAudit},install_audit=#{installAudit},
+    					experience=#{experience},problem_analysis=#{problemAnalysis},
+    					remark=#{remark},evaluate_state=#{evaluateState}
+     				WHERE proj_id=#{projId}
+  </update>
+  
+  <!-- 根据项目编号更新 -->
+  <update id="updateProjectByProjNo" parameterType="Project">
+    UPDATE history_projects SET update_time=#{updateTime},req_no=#{reqNo},proj_no=#{projNo},
+    					proj_name=#{projName},proj_type=#{projType},master_slave=#{masterSlave},
+    					proj_charge=#{projCharge},proj_manager=#{projManager},
+    					cur_state=#{curState},
+    					risk_question=#{riskQuestion},start_date=#{startDate},
+    					actual_install_date=#{actualInstallDate},
+    					plan_end_date=#{planEndDate},actual_end_date=#{actualEndDate},
+    					actual_days=#{actualDays},
+    					overdue_reason=#{overdueReason},plan_work_amount=#{planWorkAmount},
+    					actual_work_amount=#{actualWorkAmount},function_amount=#{functionAmount},
+    					productivity=#{productivity},smoke_num=#{smokeNum},st_type=#{stType},
+    					st_bug_density=#{stBugDensity},nc=#{nc},design_audit=#{designAudit},
+    					code_audit=#{codeAudit},install_audit=#{installAudit},
+    					experience=#{experience},problem_analysis=#{problemAnalysis},
+    					remark=#{remark},evaluate_state=#{evaluateState}
+     				WHERE proj_no=#{projNo}
+  </update>
+  
+  
+  <!-- 根据项目编号更新项目后评估审批状态 -->
+  <update id="updateEvaluateStateByProjNo" parameterType="Project">
+    UPDATE history_projects SET evaluate_state=#{evaluateState}
+     				WHERE proj_no=#{projNo}
+  </update>
+  
+  
+  <!-- 删除 -->
+  <delete id="deleteProject" parameterType="BigInteger">
+    DELETE FROM history_projects WHERE proj_id=#{projId}
+  </delete>
+  <!-- 根据项目编号删除 -->
+  <delete id="deleteProjectByProjNo" parameterType="String">
+    DELETE FROM history_projects WHERE proj_no=#{projNo}
+  </delete>
+</mapper>

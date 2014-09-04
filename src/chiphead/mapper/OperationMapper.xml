@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OperationMapper">
+	<resultMap type="chiphead.model.Operation" id="OperationResultMap"> 
+		<id property="operNo" column="oper_no"/> 
+		<result property="regDate" column="reg_date"/>
+		<result property="operType" column="oper_type"/> 
+		<result property="operStartTime" column="oper_start_time"/> 
+		<result property="operEndTime" column="oper_end_time"/> 
+		<result property="operation" column="operation"/>
+		<result property="level" column="level"/>
+		<result property="operators" column="operators"/>
+		<result property="system" column="system"/>
+		<!-- <result property="module" column="module"/> -->
+		<result property="belongPersons" column="belong_persons"/>
+		<result property="affectedBusiness" column="affected_business"/>
+		<result property="reason" column="reason"/>
+		<result property="suggestion" column="suggestion"/>
+		<result property="remark" column="remark"/>
+		<result property="checkState" column="check_state"/>
+	</resultMap> 
+	
+  <!-- 根据编号查询一个 -->
+  <select id="selectOperationByOperNo" parameterType="Integer" resultMap="OperationResultMap">
+    SELECT * FROM operations WHERE oper_no = #{operNo}
+  </select>
+  
+  <!-- 给定查询字段类型、值查询条数 -->
+  <select id="selectOperationsNumByParms" parameterType="chiphead.model.ProjectQueryParm" resultType="Integer">
+    SELECT count(*) FROM operations op,oper_type t
+    <where>
+    	op.oper_type = t.type_id
+    	<if test="queryType != null  and queryType == 'oper_type' and queryValue != ''">
+        AND t.type_name LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null  and queryType == 'operators' and queryValue != ''">
+        AND op.operators LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>
+    	<if test="queryType != null  and queryType == 'belong_persons' and queryValue != ''">
+        AND op.belong_persons LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>   	  	
+    </where>   
+  </select>
+  
+  
+  <!-- 给定查询字段类型、值、排序字段类型、升降序、分页参数查询多条 -->
+  <select id="selectOperationsByParms" parameterType="chiphead.model.ProjectQueryParm" resultMap="OperationResultMap">
+    SELECT * FROM operations op,oper_type t
+    <where>
+    	op.oper_type = t.type_id
+    	<if test="queryType != null  and queryType == 'oper_type' and queryValue != ''">
+        AND t.type_name LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null  and queryType == 'operators' and queryValue != ''">
+        AND op.operators LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null  and queryType == 'belong_persons' and queryValue != ''">
+        AND op.belong_persons LIKE CONCAT('%',#{queryValue},'%') 
+    	</if>     	
+    </where>  
+    	<if test="orderType == null or orderMethod == null">
+         order by op.reg_date ASC
+        </if> 
+    	<if test="orderType != null and orderMethod != null">
+         order by ${orderType} ${orderMethod}
+        </if> 
+    	 limit #{startIndex},#{fetchNum}	 
+  </select>
+  
+  <!--查询所有记录，按登记日期升序排列 -->
+  <select id="selectAllOperationsOrderByRegDateASC" resultMap="OperationResultMap">
+    SELECT * FROM operations
+         ORDER BY reg_date ASC	 
+  </select>
+  
+  
+  <!-- 增加一条记录 -->
+  <insert id="insertOperation" parameterType="Operation" 
+  		flushCache="true" statementType="PREPARED">
+    INSERT INTO operations (oper_no,reg_date,oper_type,oper_start_time,oper_end_time,operation,
+    						level,operators,system,<!--module,-->belong_persons,affected_business,
+    						reason,suggestion,remark,check_state)
+    			VALUES (#{operNo},#{regDate},#{operType},#{operStartTime},#{operEndTime},#{operation},
+    					#{level},#{operators},#{system},<!--#{module},-->#{belongPersons},#{affectedBusiness},
+    					#{reason},#{suggestion},#{remark},#{checkState})
+  </insert>
+  
+  <!-- 根据编号更新 -->
+  <update id="updateOperationByOperNo" parameterType="Operation">
+    UPDATE operations SET oper_no=#{operNo},reg_date=#{regDate},oper_type=#{operType},
+    					oper_start_time=#{operStartTime},oper_end_time=#{operEndTime},
+    					operation=#{operation},level=#{level},operators=#{operators},
+    					system=#{system},<!-- module=#{module}, -->belong_persons=#{belongPersons},
+    					affected_business=#{affectedBusiness},
+    					reason=#{reason},suggestion=#{suggestion},remark=#{remark},
+    					check_state=#{checkState}
+     				WHERE oper_no=#{operNo}
+  </update>
+  
+  
+  <!-- 根据编号更新审批状态 -->
+  <update id="updateCheckStateByOperNo" parameterType="Operation">
+    UPDATE operations SET check_state=#{checkState}
+     				WHERE oper_no=#{operNo}
+  </update>
+  
+  <!-- 删除 -->
+  <delete id="deleteOperationByOperNo" parameterType="Integer">
+    DELETE FROM operations WHERE oper_no=#{operNo}
+  </delete>
+  
+</mapper>

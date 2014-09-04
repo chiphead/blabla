@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chiphead.mapper.PersonMapper">
+  <!-- 登录查询 -->
+  <select id="selectPerson" parameterType="chiphead.model.Person" resultType="chiphead.model.Person">
+    SELECT * FROM persons WHERE emp_yst_id = #{emp_yst_id} and emp_pwd=#{emp_pwd}
+  </select>
+  
+  <!-- 根据一事通ID查询一个 -->
+  <select id="selectPersonByEmpYstId" parameterType="int" resultType="chiphead.model.Person">
+    SELECT * FROM persons WHERE emp_yst_id = #{emp_yst_id}
+  </select>
+  
+  <!-- 根据一事通ID和密码查询 -->
+  <select id="selectPersonNumByEmpYstIdPwd" parameterType="chiphead.model.Person" resultType="int">
+    SELECT COUNT(*) FROM persons WHERE emp_yst_id = #{emp_yst_id} AND
+    								   emp_pwd = #{emp_pwd}
+  </select>
+  
+  <!-- 根据一事通ID查询姓名 -->
+  <select id="selectEmpNameByEmpYstId" parameterType="int" resultType="String">
+    SELECT emp_name FROM persons WHERE emp_yst_id = #{emp_yst_id}
+  </select>
+  
+  <!-- 根据姓名查询 -->
+  <select id="selectPersonByEmpName" parameterType="String" resultType="chiphead.model.Person">
+    SELECT * FROM persons WHERE emp_name = #{emp_name}
+  </select>
+  
+  <!-- 根据姓名模糊查询 -->
+  <select id="selectPersonByEmpNamePart" parameterType="String" resultType="chiphead.model.Person">
+    SELECT * FROM persons WHERE emp_name LIKE CONCAT('%',#{emp_name},'%')
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllPersons" resultType="chiphead.model.Person">
+    SELECT * FROM persons order by emp_yst_id asc
+  </select>
+  <!-- 增加一条记录 -->
+  <insert id="insertPerson" parameterType="chiphead.model.Person"
+  		keyProperty="emp_id" keyColumn="GENERATED_KEY" useGeneratedKeys="true">
+    INSERT INTO persons (emp_yst_id, emp_name, emp_pwd, emp_aut,team_id,inner_no) VALUES (#{emp_yst_id},#{emp_name},#{emp_pwd},#{emp_aut},#{team_id},#{inner_no})
+  </insert>
+  <!-- 更新密码 -->
+  <update id="updatePwd" parameterType="chiphead.model.Person">
+    UPDATE persons SET emp_pwd=#{emp_pwd} WHERE emp_yst_id=#{emp_yst_id} AND emp_name=#{emp_name}
+  </update>
+  <!-- 删除 -->
+  <delete id="deletePerson" parameterType="int">
+    DELETE from persons WHERE emp_yst_id=#{emp_yst_id}
+  </delete>
+</mapper>

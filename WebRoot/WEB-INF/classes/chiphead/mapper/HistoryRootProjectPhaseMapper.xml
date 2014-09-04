@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HistoryRootProjectPhaseMapper">
+	<resultMap type="chiphead.model.RootProjectPhase" id="HistoryRootProjectPhaseResultMap"> 
+		<id property="rootProjPhaseId" column="root_proj_phase_id"/> 
+		<result property="projNo" column="proj_no"/>
+		<result property="rootPhaseId" column="root_phase_id"/>
+		<result property="year" column="year"/>
+		<result property="month" column="month"/>
+		<result property="weekNo" column="week_no"/>
+	</resultMap> 
+	
+  <!-- 查询一个 -->
+  <select id="selectRootProjectPhase" parameterType="BigInteger" resultMap="HistoryRootProjectPhaseResultMap">
+    SELECT * FROM history_root_project_phase WHERE root_proj_phase_id = #{rootProjPhaseId}
+  </select>
+  
+  <!-- 根据项目编号、年份、月份、周序号、阶段ID查询一个 -->
+  <select id="selectRootProjectPhaseByPYMWR" parameterType="RootProjectPhase" resultMap="HistoryRootProjectPhaseResultMap">
+    SELECT * FROM history_root_project_phase 
+    		  WHERE proj_no = #{projNo} AND
+    		  		root_phase_id = #{rootPhaseId} AND
+    				year = #{year} AND
+    				month = #{month} AND
+    				week_no = #{weekNo}
+  </select>
+  
+  <!-- 根据项目编号查询 -->
+  <select id="selectRootProjectPhaseByProjNo" parameterType="String" resultMap="HistoryRootProjectPhaseResultMap">
+    SELECT * FROM history_root_project_phase 
+    		  WHERE proj_no = #{projNo}
+  </select>
+  
+  <!-- 根据项目编号和年份查询 -->
+  <select id="selectRootProjectPhaseByProjNoYear" parameterType="RootProjectPhase" resultMap="HistoryRootProjectPhaseResultMap">
+    SELECT * FROM history_root_project_phase 
+    		  WHERE proj_no = #{projNo} AND
+    		  		year = #{year}
+  </select>
+  
+  <!-- 根据项目编号和阶段id查询 -->
+  <select id="selectRootProjectPhaseByProjNoRootPhaseId" parameterType="RootProjectPhase" resultMap="HistoryRootProjectPhaseResultMap">
+    SELECT * FROM history_root_project_phase 
+    		  WHERE proj_no = #{projNo} AND
+    		  		root_phase_id = #{rootPhaseId}
+    		  		ORDER BY year asc,month asc,week_no asc
+  </select>
+  
+  <!-- 根据项目编号、年份、月份、周序号查询 -->
+  <select id="selectRootProjectPhaseByPYMW" parameterType="RootProjectPhase" resultMap="HistoryRootProjectPhaseResultMap">
+    SELECT * FROM history_root_project_phase 
+    		  WHERE proj_no = #{projNo} AND
+    				year = #{year} AND
+    				month = #{month} AND
+    				week_no = #{weekNo}
+  </select>
+  
+  <!-- 根据项目编号、年份、月份、周序号查询阶段名 -->
+  <select id="selectRootProjectPhaseNameByPYMW" parameterType="RootProjectPhase" resultType="String">
+    SELECT rp.root_phase_name FROM history_root_project_phase rpp,root_phase rp
+    		  WHERE rpp.root_phase_id = rp.root_phase_id AND
+    		  		rpp.proj_no = #{projNo} AND
+    				rpp.year = #{year} AND
+    				rpp.month = #{month} AND
+    				rpp.week_no = #{weekNo}
+  </select>
+  
+  <!-- 查询多个 -->
+  <select id="selectAllRootProjectPhases" resultMap="HistoryRootProjectPhaseResultMap">
+    SELECT * FROM history_root_project_phase
+  </select>
+  
+  <!-- 增加一条记录 -->
+  <insert id="insertRootProjectPhase" parameterType="RootProjectPhase" 
+  		flushCache="true" statementType="PREPARED">
+    INSERT INTO history_root_project_phase (root_proj_phase_id,proj_no,root_phase_id,
+    							year,month,week_no)
+    			VALUES (#{rootProjPhaseId},#{projNo},#{rootPhaseId},
+    							#{year},#{month},#{weekNo})
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="updateRootProjectPhase" parameterType="RootProjectPhase">
+    UPDATE history_root_project_phase SET proj_no=#{projNo},root_phase_id=#{rootPhaseId},
+    						year=#{year},month=#{month},week_no=#{weekNo}
+     				WHERE root_proj_phase_id=#{rootProjPhaseId}
+  </update>
+  
+  <!-- 删除 -->
+  <delete id="deleteRootProjectPhase" parameterType="BigInteger">
+    DELETE FROM history_root_project_phase WHERE root_proj_phase_id=#{rootProjPhaseId}
+  </delete>
+  
+  <!-- 根据项目编号删除 -->
+  <delete id="deleteRootProjectPhaseByProjNo" parameterType="String">
+    DELETE FROM history_root_project_phase WHERE proj_no =#{projNo}
+  </delete>
+</mapper>

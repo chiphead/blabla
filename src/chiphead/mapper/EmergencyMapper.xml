@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EmergencyMapper">
+	<resultMap type="chiphead.model.Emergency" id="EmergencyResultMap"> 
+		<id property="emerNo" column="emer_no"/> 
+		<result property="regDate" column="reg_date"/>
+		<result property="emerDate" column="emer_date"/>
+		<result property="emerContent" column="emer_content"/> 
+		<result property="influence" column="influence"/>
+		<result property="analytics" column="analytics"/>
+		<result property="code" column="code"/>
+		<result property="level" column="level"/>
+		<result property="operators" column="operators"/>
+		<result property="projNo" column="proj_no"/>
+		<result property="projName" column="proj_name"/>
+		<result property="projManager" column="proj_manager"/>
+		<result property="responsible" column="responsible"/>
+		<result property="system" column="system"/>
+		<result property="remark" column="remark"/>
+	</resultMap>
+
+  <!-- 根据编号查询一个 -->
+  <select id="selectEmergencyByEmerNo" parameterType="Integer" resultMap="EmergencyResultMap">
+    SELECT * FROM emergency WHERE emer_no = #{emerNo}
+  </select>
+  
+  <!-- 给定查询字段类型、值查询条数 -->
+  <select id="selectEmergencyNumByParms" parameterType="chiphead.model.ProjectQueryParm" resultType="Integer">
+    SELECT count(*) FROM emergency eme
+    <where>
+    	<if test="queryType != null  and queryType == 'proj_no' and queryValue != ''">
+        eme.proj_no LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null  and queryType == 'proj_name' and queryValue != ''">
+        eme.proj_name LIKE CONCAT('%',#{queryValue},'%')
+        </if> 
+    	<if test="queryType != null  and queryType == 'emer_date' and queryValue != ''">
+        eme.emer_date=#{queryValue}
+        </if>
+    </where>   
+  </select>
+  
+  <!-- 给定查询字段类型、值、排序字段类型、升降序、分页参数查询多条 -->
+  <select id="selectEmergencyByParms" parameterType="chiphead.model.ProjectQueryParm" resultMap="EmergencyResultMap">
+    SELECT 	emer_no,reg_date,emer_date,emer_content,influence,
+    		analytics,code,le.level_name as level,operators,proj_no,proj_name,
+    		proj_manager,responsible,st.type_name as system,remark 
+    		FROM emergency eme, level le, system_type st
+    <where>
+    	le.level_id=eme.level AND st.type_id=eme.system
+    	<if test="queryType != null  and queryType == 'proj_no' and queryValue != ''">
+        AND eme.proj_no LIKE CONCAT('%',#{queryValue},'%') 
+    	</if> 
+    	<if test="queryType != null  and queryType == 'proj_name' and queryValue != ''">
+        AND eme.proj_name LIKE CONCAT('%',#{queryValue},'%')
+        </if> 
+    	<if test="queryType != null  and queryType == 'emer_date' and queryValue != ''">
+        AND eme.emer_date=#{queryValue}
+        </if>
+    </where>
+    	<if test="orderType == null or orderMethod == null">
+         order by eme.reg_date ASC
+        </if>   
+    	<if test="orderType != null and orderMethod != null">
+         order by eme.${orderType} ${orderMethod}
+        </if> 
+    	 limit #{startIndex},#{fetchNum}	 
+  </select>
+  
+  <!--查询所有记录，按提出日期升序排列 -->
+  <select id="selectAllEmergencyOrderByRegDateASC" resultMap="EmergencyResultMap">
+    SELECT 	emer_no,reg_date,emer_date,emer_content,influence,
+    		analytics,code,le.level_name as level,operators,proj_no,proj_name,
+    		proj_manager,responsible,st.type_name as system,remark 
+    		FROM emergency eme, level le, system_type st
+    <where>
+    	le.level_id=eme.level AND st.type_id=eme.system
+    </where>
+    ORDER BY reg_date ASC
+  </select>
+  
+  
+  <!-- 增加一条记录 -->
+  <insert id="insertEmergency" parameterType="chiphead.model.Emergency" 
+  		flushCache="true" statementType="PREPARED">
+    INSERT INTO emergency (emer_no,reg_date,emer_date,emer_content,influence,analytics,code,level,
+    						operators,proj_no,proj_name,proj_manager,responsible,system,remark)
+    			VALUES (#{emerNo},#{regDate},#{emerDate},#{emerContent},#{influence},#{analytics},
+    					#{code},#{level},#{operators},#{projNo},#{projName},#{projManager},
+    					#{responsible},#{system},#{remark})
+  </insert>
+  
+  <!-- 根据编号更新 -->
+  <update id="updateEmergencyByEmerNo" parameterType="chiphead.model.Emergency">
+    UPDATE emergency SET emer_no=#{emerNo},reg_date=#{regDate},emer_date=#{emerDate},
+    					emer_content=#{emerContent},influence=#{influence},
+    					analytics=#{analytics},code=#{code},
+    					level=#{level},operators=#{operators},
+    					proj_no=#{projNo},proj_name=#{projName},
+    					proj_manager=#{projManager},responsible=#{responsible},
+    					system=#{system},remark=#{remark}
+     				WHERE emer_no=#{emerNo}
+  </update>
+    
+  <!-- 删除 -->
+  <delete id="deleteEmergencyByEmerNo" parameterType="Integer">
+    DELETE FROM emergency WHERE emer_no=#{emerNo}
+  </delete>
+  
+</mapper>
